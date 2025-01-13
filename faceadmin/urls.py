@@ -16,7 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from api.views import UserView, PhotoView, AttendanceView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/users/', UserView.as_view(), name='users'),
+    path('api/photos/', PhotoView.as_view(), name='photos'),
+    path('api/attendance/', AttendanceView.as_view(), name='attendance'),
 ]
+
