@@ -1,26 +1,38 @@
 from django.db import models
 
 class User(models.Model):
-    name = models.CharField(max_length=100)
+    user_id = models.AutoField(primary_key=True)
+    fname = models.CharField(max_length=100)
+    lname = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.name
+    class Meta:
+        db_table = 'users'
 
 class Photo(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photos')
+    photo_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(
+        'User', 
+        on_delete=models.CASCADE, 
+        db_column='user_id'
+    )
     photo_path = models.TextField()
 
-    def __str__(self):
-        return f"Photo of {self.user.name}"
+    class Meta:
+        db_table = 'photos'
 
 class Attendance(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attendance')
-    check_in = models.DateTimeField(null=True, blank=True)
+    attendance_id = models.AutoField(primary_key=True,)
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        db_column='user_id'
+    )
+    check_in = models.DateTimeField()
     check_out = models.DateTimeField(null=True, blank=True)
     duration = models.DurationField(null=True, blank=True)
 
-    def __str__(self):
-        return f"Attendance of {self.user.name}"
+    class Meta:
+        db_table = 'attendance'
 
