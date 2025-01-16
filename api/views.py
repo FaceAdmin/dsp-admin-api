@@ -5,6 +5,10 @@ from .models import User, Photo, Attendance
 from .serializers import UserSerializer, PhotoSerializer, AttendanceSerializer
 
 class UserView(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -13,6 +17,11 @@ class UserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PhotoView(APIView):
+    def get(self, request):
+        photos = Photo.objects.all()
+        serializer = PhotoSerializer(photos, many=True)
+        return Response(serializer.data)
+    
     def post(self, request):
         serializer = PhotoSerializer(data=request.data)
         if serializer.is_valid():

@@ -12,7 +12,7 @@ class User(models.Model):
 
 class Photo(models.Model):
     photo_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(
+    user_id = models.ForeignKey(
         'User', 
         on_delete=models.CASCADE, 
         db_column='user_id'
