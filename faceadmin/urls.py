@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/users/', UserView.as_view(), name='users'),
     path('api/photos/', PhotoView.as_view(), name='photos'),
     path('api/attendance/', AttendanceView.as_view(), name='attendance'),
+    path('api/attendance/<int:pk>/', AttendanceView.as_view(), name='attendance-detail'),
 ]
 
