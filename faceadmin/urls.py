@@ -21,6 +21,7 @@ from api.views import UserView, PhotoView, AttendanceView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', UserView.as_view(), name='users'),
+    path('api/users/<int:pk>/', UserView.as_view(), name='user-detail'),
     path('api/photos/', PhotoView.as_view(), name='photos'),
     path('api/attendance/', AttendanceView.as_view(), name='attendance'),
     path('api/attendance/<int:pk>/', AttendanceView.as_view(), name='attendance-detail'),
