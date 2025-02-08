@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api.views import UserView, PhotoView, AttendanceView
+from api.views import UserView, PhotoView, AttendanceView, LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +25,6 @@ urlpatterns = [
     path('api/photos/', PhotoView.as_view(), name='photos'),
     path('api/attendance/', AttendanceView.as_view(), name='attendance'),
     path('api/attendance/<int:pk>/', AttendanceView.as_view(), name='attendance-detail'),
+    path('api/login/', LoginView.as_view(), name='login')
 ]
 

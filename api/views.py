@@ -1,8 +1,12 @@
+from django.contrib.auth.hashers import check_password
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import User, Photo, Attendance
 from .serializers import UserSerializer, PhotoSerializer, AttendanceSerializer
+import jwt
+import datetime
+from django.conf import settings
 
 class UserView(APIView):
     def get(self, request, pk=None):
@@ -86,3 +90,30 @@ class AttendanceView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class LoginView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+        print(f"User email: {user.email}, Input password: {password}, DB password: {user.password}")
+
+        if not check_password(password, user.password):
+            return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # jwt token
+        payload = {
+            "user_id": user.user_id,
+            "email": user.email,
+            "role": user.role,
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),  # expires in 1 day
+            "iat": datetime.datetime.utcnow(),
+        }
+
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+
+        return Response({"token": token, "user": UserSerializer(user).data}, status=status.HTTP_200_OK)

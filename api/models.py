@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, is_password_usable
 
 class User(models.Model):
     user_id = models.AutoField(primary_key=True)
@@ -13,7 +13,7 @@ class User(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        if not self.pk or 'password' in kwargs.get('update_fields', []):
+        if not self.pk or ('password' in kwargs.get('update_fields', []) and is_password_usable(self.password)):
             self.password = make_password(self.password)
         super(User, self).save(*args, **kwargs)
 
