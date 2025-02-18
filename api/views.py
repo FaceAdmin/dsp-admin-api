@@ -5,7 +5,7 @@ from rest_framework import status
 from .models import User, Photo, Attendance
 from .serializers import UserSerializer, PhotoSerializer, AttendanceSerializer
 import jwt
-import datetime
+from datetime import datetime, timedelta, timezone
 from django.conf import settings
 
 class UserView(APIView):
@@ -100,7 +100,6 @@ class LoginView(APIView):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
-        print(f"User email: {user.email}, Input password: {password}, DB password: {user.password}")
 
         if not check_password(password, user.password):
             return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
@@ -110,10 +109,20 @@ class LoginView(APIView):
             "user_id": user.user_id,
             "email": user.email,
             "role": user.role,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),  # expires in 1 day
-            "iat": datetime.datetime.utcnow(),
+            "exp": datetime.now(timezone.utc) + timedelta(days=1),
+            "iat": datetime.now(timezone.utc),
         }
 
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
 
-        return Response({"token": token, "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+        response = Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+        response.set_cookie(
+            key="auth_token",
+            value=token,
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+            max_age=86400
+        )
+
+        return response
