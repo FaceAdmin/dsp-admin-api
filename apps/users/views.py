@@ -4,7 +4,6 @@ from rest_framework import status
 from django.contrib.auth.hashers import check_password
 from datetime import datetime, timedelta, timezone
 import jwt
-
 from django.conf import settings
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
