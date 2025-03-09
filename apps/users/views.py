@@ -52,6 +52,31 @@ class UserView(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+class MeView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get("token")
+        if not token:
+            return Response({"error": "Not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "Token has expired"}, status=status.HTTP_401_UNAUTHORIZED)
+        except jwt.InvalidTokenError:
+            return Response({"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user_id = payload.get("user_id")
+        if not user_id:
+            return Response({"error": "Invalid token payload"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            user = User.objects.get(user_id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -77,15 +102,20 @@ class LoginView(APIView):
 
         response = Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
         response.set_cookie(
-            key="auth_token",
+            key="token",
             value=token,
             httponly=True,
             secure=True,
             samesite="Lax",
-            max_age=86400
         )
         return response
-
+    
+class LogoutView(APIView):
+    def post(self, request):
+        response = Response({"message": "Logged out successfully"}, status=200)
+        response.delete_cookie("token", path="/")
+        return response
+    
 class PhotoView(APIView):
     def get(self, request):
         photos = Photo.objects.all()

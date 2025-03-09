@@ -1,11 +1,14 @@
 from django.urls import path
 
-from .views import UserView, LoginView, PhotoView
+from .views import LogoutView, MeView, UserView, LoginView, PhotoView
 
 urlpatterns = [
-    path('', UserView.as_view()),           # GET all users or POST create user
-    path('<int:pk>/', UserView.as_view()),  # GET/DELETE/PATCH user by ID
-    path('login/', LoginView.as_view()),    # POST for login
-    path('', PhotoView.as_view()),          # GET all photos or POST create
-    path('<int:pk>/', PhotoView.as_view()), # GET photo by ID
+    path('', UserView.as_view()),
+    path('<int:pk>/', UserView.as_view()),
+    path('login/', LoginView.as_view()),
+    path('logout/', LogoutView.as_view()),
+    path('me/', MeView.as_view()),
+
+    path('', PhotoView.as_view()),
+    path('<int:pk>/', PhotoView.as_view()),
 ]

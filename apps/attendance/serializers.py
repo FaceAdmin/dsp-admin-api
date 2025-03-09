@@ -17,7 +17,6 @@ class AttendanceSerializer(serializers.ModelSerializer):
         )
 
     def get_user(self, obj):
-        """Вернем вложенный объект user, чтобы фронтенд мог делать record.user.fname и т.д."""
         return {
             "user_id": obj.user.user_id,
             "fname": obj.user.fname,
