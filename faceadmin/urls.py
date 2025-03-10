@@ -22,4 +22,5 @@ urlpatterns = [
     path('users/', include('apps.users.urls')),
     path('photos/', include('apps.users.urls')),
     path('attendance/', include('apps.attendance.urls')),
+    path('entry-codes/', include('apps.entrycode.urls')),
 ]

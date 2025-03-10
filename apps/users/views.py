@@ -106,7 +106,7 @@ class LoginView(APIView):
             value=token,
             httponly=True,
             secure=True,
-            samesite="Lax",
+            samesite="None",
         )
         return response
     
