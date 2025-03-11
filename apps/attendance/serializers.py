@@ -3,8 +3,8 @@ from apps.attendance.models import Attendance
 
 class AttendanceSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
-    check_in = serializers.SerializerMethodField()
-    check_out = serializers.SerializerMethodField()
+    check_in = serializers.DateTimeField(required=False, allow_null=True)
+    check_out = serializers.DateTimeField(required=False, allow_null=True)
 
     class Meta:
         model = Attendance
@@ -34,3 +34,16 @@ class AttendanceSerializer(serializers.ModelSerializer):
         if obj.check_out:
             return obj.check_out.isoformat()
         return None
+    
+    def update(self, instance, validated_data):
+        instance.check_in = validated_data.get('check_in', instance.check_in)
+        instance.check_out = validated_data.get('check_out', instance.check_out)
+
+        if instance.check_in and instance.check_out:
+            delta = instance.check_out - instance.check_in
+            instance.duration = delta
+        else:
+            instance.duration = None
+
+        instance.save()
+        return instance
