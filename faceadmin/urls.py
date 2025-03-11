@@ -23,4 +23,5 @@ urlpatterns = [
     path('photos/', include('apps.users.urls')),
     path('attendance/', include('apps.attendance.urls')),
     path('entry-codes/', include('apps.entrycode.urls')),
+    path('reports/', include('apps.reports.urls')),
 ]

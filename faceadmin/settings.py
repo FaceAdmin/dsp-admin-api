@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.attendance',
     'apps.entrycode',
+    'apps.reports',
 ]
 
 MIDDLEWARE = [
