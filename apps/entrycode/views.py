@@ -8,7 +8,7 @@ class EntryCodeView(APIView):
     def get(self, request, pk=None):
         if pk:
             try:
-                entry_code = EntryCode.objects.get(user__user_id=pk)  # <-- Ищем по user_id
+                entry_code = EntryCode.objects.get(user__user_id=pk)
             except EntryCode.DoesNotExist:
                 return Response({"error": "Entry code not found"}, status=status.HTTP_404_NOT_FOUND)
             serializer = EntryCodeSerializer(entry_code)
@@ -27,7 +27,7 @@ class EntryCodeView(APIView):
     
     def patch(self, request, pk):
         try:
-            entry_code = EntryCode.objects.get(pk=pk)
+            entry_code = EntryCode.objects.get(user__user_id=pk)
         except EntryCode.DoesNotExist:
             return Response({"error": "Entry code not found"}, status=status.HTTP_404_NOT_FOUND)
         
@@ -39,7 +39,7 @@ class EntryCodeView(APIView):
     
     def delete(self, request, pk):
         try:
-            entry_code = EntryCode.objects.get(pk=pk)
+            entry_code = EntryCode.objects.get(user__user_id=pk)
             entry_code.delete()
             return Response({"message": "Entry code deleted successfully"}, status=status.HTTP_200_OK)
         except EntryCode.DoesNotExist:
