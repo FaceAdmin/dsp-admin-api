@@ -7,8 +7,6 @@ import jwt
 from django.conf import settings
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
-from apps.users.models import Photo
-from apps.users.serializers import PhotoSerializer
 
 class UserView(APIView):
     def get(self, request, pk=None):
@@ -115,16 +113,3 @@ class LogoutView(APIView):
         response = Response({"message": "Logged out successfully"}, status=200)
         response.delete_cookie("token", path="/")
         return response
-    
-class PhotoView(APIView):
-    def get(self, request):
-        photos = Photo.objects.all()
-        serializer = PhotoSerializer(photos, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = PhotoSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

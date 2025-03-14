@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Photo
+from .models import User
 from django.contrib.auth.hashers import make_password
 
 class UserSerializer(serializers.ModelSerializer):
@@ -21,9 +21,3 @@ class UserSerializer(serializers.ModelSerializer):
         if newPassword:
             instance.password = make_password(newPassword)
         return super().update(instance, validated_data)
-
-
-class PhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Photo
-        fields = '__all__'

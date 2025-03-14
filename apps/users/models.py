@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password, is_password_usable
 
 class User(models.Model):
     user_id = models.AutoField(primary_key=True)
@@ -13,15 +12,3 @@ class User(models.Model):
 
     class Meta:
         db_table = 'users'
-
-class Photo(models.Model):
-    photo_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(
-        'User', 
-        on_delete=models.CASCADE, 
-        db_column='user_id'
-    )
-    photo_path = models.TextField()
-
-    class Meta:
-        db_table = 'photos'
