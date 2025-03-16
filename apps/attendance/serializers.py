@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from apps.attendance.models import Attendance
+from apps.users.models import User
 
 class AttendanceSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     check_in = serializers.DateTimeField(required=False, allow_null=True)
     check_out = serializers.DateTimeField(required=False, allow_null=True)
 
@@ -15,6 +16,17 @@ class AttendanceSerializer(serializers.ModelSerializer):
             'check_out',
             'duration',
         )
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['user'] = {
+            "user_id": instance.user.user_id,
+            "fname": instance.user.fname,
+            "lname": instance.user.lname,
+            "email": instance.user.email,
+            "role": instance.user.role,
+        }
+        return ret
 
     def get_user(self, obj):
         return {
