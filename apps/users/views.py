@@ -88,7 +88,6 @@ class LoginView(APIView):
         if not check_password(password, user.password):
             return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create JWT token
         payload = {
             "user_id": user.user_id,
             "email": user.email,
