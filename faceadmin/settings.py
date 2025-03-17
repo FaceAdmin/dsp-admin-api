@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'apps.entrycode',
     'apps.reports',
     'apps.photos',
+    'apps.logs',
 ]
 
 MIDDLEWARE = [
