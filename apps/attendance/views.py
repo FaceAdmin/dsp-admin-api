@@ -6,6 +6,16 @@ from apps.attendance.serializers import AttendanceSerializer
 
 class AttendanceView(APIView):
     def get(self, request, pk=None):
+        user_id = request.query_params.get('user_id')
+        date_param = request.query_params.get('date')
+
+        if user_id:
+            records = Attendance.objects.filter(user__user_id=user_id)
+            if date_param:
+                records = records.filter(check_in__date=date_param)
+            serializer = AttendanceSerializer(records, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         if pk:
             try:
                 attendance = Attendance.objects.get(pk=pk)
@@ -13,18 +23,14 @@ class AttendanceView(APIView):
                 return Response({"error": "Record not found"}, status=status.HTTP_404_NOT_FOUND)
             serializer = AttendanceSerializer(attendance)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+        if date_param:
+            records = Attendance.objects.filter(check_in__date=date_param)
         else:
-            date_param = request.query_params.get('date')
-            if date_param:
-                try:
-                    records = Attendance.objects.filter(check_in__date=date_param)
-                except ValueError:
-                    return Response({"error"},
-                                    status=status.HTTP_400_BAD_REQUEST)
-            else:
-                records = Attendance.objects.all()
-            serializer = AttendanceSerializer(records, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            records = Attendance.objects.all()
+
+        serializer = AttendanceSerializer(records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = AttendanceSerializer(data=request.data)

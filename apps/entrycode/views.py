@@ -6,6 +6,14 @@ from apps.entrycode.serializers import EntryCodeSerializer
 
 class EntryCodeView(APIView):
     def get(self, request, pk=None):
+        code = request.query_params.get("code")
+        if code:
+            try:
+                entry_code = EntryCode.objects.get(code=code)
+            except EntryCode.DoesNotExist:
+                return Response({"error": "Entry code not found"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = EntryCodeSerializer(entry_code)
+            return Response(serializer.data)
         if pk:
             try:
                 entry_code = EntryCode.objects.get(user__user_id=pk)
