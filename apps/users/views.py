@@ -7,6 +7,7 @@ import jwt
 from django.conf import settings
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
+import pyotp
 
 class UserView(APIView):
     def get(self, request, pk=None):
@@ -112,3 +113,26 @@ class LogoutView(APIView):
         response = Response({"message": "Logged out successfully"}, status=200)
         response.delete_cookie("token", path="/")
         return response
+    
+class VerifyOTPView(APIView):
+    """
+    Эндпоинт для проверки OTP.
+    Ожидает POST-запрос с полями "email" и "otp_code".
+    """
+    def post(self, request):
+        email = request.data.get("email")
+        otp_code = request.data.get("otp_code")
+        if not email or not otp_code:
+            return Response({"error": "Email and OTP code are required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        totp = pyotp.TOTP(user.otp_secret)
+        if totp.verify(otp_code):
+            user.otp_configured = True
+            user.save()
+            return Response({"message": "OTP verified successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid OTP code."}, status=status.HTTP_400_BAD_REQUEST)

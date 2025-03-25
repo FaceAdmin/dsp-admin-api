@@ -22,7 +22,6 @@ urlpatterns = [
     path('users/', include('apps.users.urls')),
     path('photos/', include('apps.photos.urls')),
     path('attendance/', include('apps.attendance.urls')),
-    path('entry-codes/', include('apps.entrycode.urls')),
     path('reports/', include('apps.reports.urls')),
     path("logs/", include("apps.logs.urls")),
 ]

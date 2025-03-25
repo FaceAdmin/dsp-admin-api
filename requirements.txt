@@ -2,3 +2,7 @@ django
 djangorestframework
 psycopg2
 PyJWT
+pyotp
+qrcode[pil]
+sendgrid
+sendgrid-django

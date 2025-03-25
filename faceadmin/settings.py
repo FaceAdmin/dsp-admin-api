@@ -45,11 +45,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'apps.users',
     'apps.attendance',
-    'apps.entrycode',
     'apps.reports',
     'apps.photos',
     'apps.logs',
 ]
+
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = env("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

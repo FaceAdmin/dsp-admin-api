@@ -4,10 +4,11 @@ from django.contrib.auth.hashers import make_password
 
 class UserSerializer(serializers.ModelSerializer):
     newPassword = serializers.CharField(write_only=True, required=False)
+    otp_configured = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
-        fields = ['user_id', 'fname', 'lname', 'email', 'role', 'password', 'newPassword', 'created_at', 'updated_at']
+        fields = ['user_id', 'fname', 'lname', 'email', 'role', 'password', 'newPassword', 'otp_configured', 'created_at', 'updated_at']
         extra_kwargs = {
             'password': {'write_only': True},
         }

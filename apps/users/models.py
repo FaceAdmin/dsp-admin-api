@@ -7,6 +7,8 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=50)
     password = models.CharField(max_length=128)
+    otp_secret = models.CharField(max_length=32, blank=True, null=True)
+    otp_configured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
