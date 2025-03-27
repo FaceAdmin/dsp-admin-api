@@ -21,7 +21,7 @@ def send_otp_email(user):
         <p>Hello <strong>{user.fname}</strong>,</p>
         <p>Please scan this QR code with your authenticator app to set up your entry code.</p>
         <p><img src="cid:qr-code-img" alt="OTP QR Code" width="200"/></p>
-        <p>If you cannot scan the code, use the following secret: <code>{user.otp_secret}</code></p>
+        <p>If you cannot scan the code, use the following setup key: <code>{user.otp_secret}</code></p>
         <br>
         <p>Best Regards,<br/>FaceAdmin Team</p>
     """

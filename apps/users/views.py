@@ -133,6 +133,6 @@ class VerifyOTPView(APIView):
         if totp.verify(otp_code):
             user.otp_configured = True
             user.save()
-            return Response({"message": "OTP verified successfully."}, status=status.HTTP_200_OK)
+            return Response({"message": "OTP verified successfully", "user_id": user.user_id}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid OTP code."}, status=status.HTTP_400_BAD_REQUEST)
