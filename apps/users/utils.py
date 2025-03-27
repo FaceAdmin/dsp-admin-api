@@ -16,33 +16,40 @@ def generate_qr_base64(user):
 
 def send_otp_email(user):
     base64_qr = generate_qr_base64(user)
-    img_tag = f'<img src="data:image/png;base64,{base64_qr}" alt="OTP QR Code" width="200"/>'
 
-    #TODO Change the email content and also fix the QR Code generation
     html_content = f"""
         <p>Hello <strong>{user.fname}</strong>,</p>
-        <p>Please scan this QR code with your Google Authenticator app to set up two-factor authentication.</p>
-        {img_tag}
+        <p>Please scan this QR code with your authenticator app to set up your entry code.</p>
+        <p><img src="cid:qr-code-img" alt="OTP QR Code" width="200"/></p>
         <p>If you cannot scan the code, use the following secret: <code>{user.otp_secret}</code></p>
-        <p><strong>Issuer:</strong> FaceAdmin</p>
         <br>
-        <p>Thanks,<br/>FaceAdmin Team</p>
+        <p>Best Regards,<br/>FaceAdmin Team</p>
     """
 
     mail_data = {
         "personalizations": [
             {
-                "to": [
-                    {"email": user.email}
-                ],
+                "to": [{"email": user.email}],
                 "subject": "Your FaceAdmin OTP Setup"
             }
         ],
-        "from": {"email": "noreply@faceadmin.org"},
+        "from": {
+            "email": "noreply@faceadmin.org",
+            "name": "FaceAdmin"
+        },
         "content": [
             {
                 "type": "text/html",
                 "value": html_content
+            }
+        ],
+        "attachments": [
+            {
+                "content": base64_qr,
+                "type": "image/png",
+                "filename": "qrcode.png",
+                "disposition": "inline",
+                "content_id": "qr-code-img"
             }
         ]
     }

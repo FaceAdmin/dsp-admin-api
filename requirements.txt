@@ -6,3 +6,4 @@ pyotp
 qrcode[pil]
 sendgrid
 sendgrid-django
+django-cryptography
