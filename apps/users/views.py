@@ -9,6 +9,8 @@ from apps.users.models import User
 from apps.users.serializers import UserSerializer
 import pyotp
 
+from apps.users.utils import send_otp_email
+
 class UserView(APIView):
     def get(self, request, pk=None):
         if pk:
@@ -115,10 +117,6 @@ class LogoutView(APIView):
         return response
     
 class VerifyOTPView(APIView):
-    """
-    Эндпоинт для проверки OTP.
-    Ожидает POST-запрос с полями "email" и "otp_code".
-    """
     def post(self, request):
         email = request.data.get("email")
         otp_code = request.data.get("otp_code")
@@ -136,3 +134,22 @@ class VerifyOTPView(APIView):
             return Response({"message": "OTP verified successfully", "user_id": user.user_id}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid OTP code."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class ResendOTPEmailView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if user.otp_configured:
+            return Response({"message": "OTP already configured."}, status=status.HTTP_200_OK)
+        
+        try:
+            send_otp_email(user)
+            return Response({"message": "OTP email sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
