@@ -153,3 +153,21 @@ class ResendOTPEmailView(APIView):
             return Response({"message": "OTP email sent successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class RegenerateOTPSecretView(APIView):
+    def post(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user.otp_secret = pyotp.random_base32()
+        user.otp_configured = False
+        user.save()
+
+        try:
+            send_otp_email(user)
+        except Exception as e:
+            return Response({"error": f"Failed to send email: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"message": "OTP secret regenerated and email sent."}, status=status.HTTP_200_OK)
