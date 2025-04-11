@@ -21,8 +21,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['user'] = {
             "user_id": instance.user.user_id,
-            "fname": instance.user.fname,
-            "lname": instance.user.lname,
+            "first_name": instance.user.first_name,
+            "last_name": instance.user.last_name,
             "email": instance.user.email,
             "role": instance.user.role,
         }
@@ -31,8 +31,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         return {
             "user_id": obj.user.user_id,
-            "fname": obj.user.fname,
-            "lname": obj.user.lname,
+            "first_name": obj.user.first_name,
+            "last_name": obj.user.last_name,
             "email": obj.user.email,
             "role": obj.user.role,
         }

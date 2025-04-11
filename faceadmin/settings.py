@@ -49,7 +49,17 @@ INSTALLED_APPS = [
     'apps.reports',
     'apps.photos',
     'apps.logs',
+    'apps.authentication', 
+    'rest_framework.authtoken',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'apps.authentication.cookie_token.CookieTokenAuthentication',
+    ],
+}
+
+AUTH_USER_MODEL = "users.User"
 
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = env("SENDGRID_API_KEY")

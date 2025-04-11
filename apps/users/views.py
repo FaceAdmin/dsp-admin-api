@@ -1,14 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.hashers import check_password
-from datetime import datetime, timedelta, timezone
-import jwt
-from django.conf import settings
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
 import pyotp
-
 from apps.users.utils import send_otp_email
 
 class UserView(APIView):
@@ -53,70 +48,10 @@ class UserView(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-class MeView(APIView):
-    def get(self, request):
-        token = request.COOKIES.get("token")
-        if not token:
-            return Response({"error": "Not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        except jwt.ExpiredSignatureError:
-            return Response({"error": "Token has expired"}, status=status.HTTP_401_UNAUTHORIZED)
-        except jwt.InvalidTokenError:
-            return Response({"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        user_id = payload.get("user_id")
-        if not user_id:
-            return Response({"error": "Invalid token payload"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        try:
-            user = User.objects.get(user_id=user_id)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-class LoginView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not check_password(password, user.password):
-            return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
-
-        payload = {
-            "user_id": user.user_id,
-            "email": user.email,
-            "role": user.role,
-            "exp": datetime.now(timezone.utc) + timedelta(days=1),
-            "iat": datetime.now(timezone.utc),
-        }
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
-
-        response = Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
-        response.set_cookie(
-            key="token",
-            value=token,
-            httponly=True,
-            secure=True,
-            samesite="None",
-        )
-        return response
-    
-class LogoutView(APIView):
-    def post(self, request):
-        response = Response({"message": "Logged out successfully"}, status=200)
-        response.delete_cookie("token", path="/")
-        return response
-    
 class VerifyOTPView(APIView):
+    """
+    Проверка одноразового пароля (OTP) для пользователя.
+    """
     def post(self, request):
         email = request.data.get("email")
         otp_code = request.data.get("otp_code")
@@ -134,8 +69,11 @@ class VerifyOTPView(APIView):
             return Response({"message": "OTP verified successfully", "user_id": user.user_id}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid OTP code."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class ResendOTPEmailView(APIView):
+    """
+    Отправка email с настройками OTP, если он ещё не сконфигурирован.
+    """
     def post(self, request):
         email = request.data.get("email")
         if not email:
@@ -153,8 +91,11 @@ class ResendOTPEmailView(APIView):
             return Response({"message": "OTP email sent successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
 class RegenerateOTPSecretView(APIView):
+    """
+    Генерация нового ключа OTP для пользователя и отправка email.
+    """
     def post(self, request, pk):
         try:
             user = User.objects.get(pk=pk)

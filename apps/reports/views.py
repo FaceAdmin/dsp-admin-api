@@ -43,8 +43,8 @@ def generate_csv_report(request):
         check_out = attendance.check_out.strftime("%Y-%m-%d %H:%M") if attendance.check_out else "Still in office"
         duration = str(attendance.duration) if attendance.duration else "N/A"
         writer.writerow([
-            attendance.user.fname,
-            attendance.user.lname,
+            attendance.user.first_name,
+            attendance.user.last_name,
             attendance.user.email,
             attendance.user.role,
             check_in,

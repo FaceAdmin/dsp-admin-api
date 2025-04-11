@@ -18,7 +18,7 @@ def send_otp_email(user):
     base64_qr = generate_qr_base64(user)
 
     html_content = f"""
-        <p>Hello <strong>{user.fname}</strong>,</p>
+        <p>Hello <strong>{user.full_name}</strong>,</p>
         <p>Please scan this QR code with your authenticator app to set up your entry code.</p>
         <p><img src="cid:qr-code-img" alt="OTP QR Code" width="200"/></p>
         <p>If you cannot scan the code, use the following setup key: <code>{user.otp_secret}</code></p>
