@@ -6,9 +6,6 @@ class MyUserManager(BaseUserManager):
     use_in_migrations = True
 
     def create_user(self, email, password=None, **extra_fields):
-        """
-        Создает и сохраняет обычного пользователя с указанным email и паролем.
-        """
         if not email:
             raise ValueError("Email is required")
         email = self.normalize_email(email)
@@ -18,9 +15,6 @@ class MyUserManager(BaseUserManager):
         return user
         
     def create_superuser(self, email, password, **extra_fields):
-        """
-        Создает и сохраняет суперпользователя с указанным email и паролем.
-        """
         extra_fields.setdefault("role", "Admin")
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
