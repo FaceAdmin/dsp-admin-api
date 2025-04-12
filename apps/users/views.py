@@ -5,8 +5,10 @@ from apps.users.models import User
 from apps.users.serializers import UserSerializer
 import pyotp
 from apps.users.utils import send_otp_email
+from rest_framework.permissions import IsAuthenticated
 
 class UserView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk=None):
         if pk:
             try:
@@ -49,9 +51,6 @@ class UserView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class VerifyOTPView(APIView):
-    """
-    Проверка одноразового пароля (OTP) для пользователя.
-    """
     def post(self, request):
         email = request.data.get("email")
         otp_code = request.data.get("otp_code")
@@ -71,9 +70,7 @@ class VerifyOTPView(APIView):
             return Response({"error": "Invalid OTP code."}, status=status.HTTP_400_BAD_REQUEST)
 
 class ResendOTPEmailView(APIView):
-    """
-    Отправка email с настройками OTP, если он ещё не сконфигурирован.
-    """
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         email = request.data.get("email")
         if not email:
@@ -93,9 +90,7 @@ class ResendOTPEmailView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RegenerateOTPSecretView(APIView):
-    """
-    Генерация нового ключа OTP для пользователя и отправка email.
-    """
+    permission_classes = [IsAuthenticated]
     def post(self, request, pk):
         try:
             user = User.objects.get(pk=pk)

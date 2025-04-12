@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.attendance.models import Attendance
 from apps.attendance.serializers import AttendanceSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class AttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk=None):
         user_id = request.query_params.get('user_id')
         date_param = request.query_params.get('date')

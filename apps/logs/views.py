@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Log
 from .serializers import LogSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class LogView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         logs = Log.objects.order_by("-timestamp")[:50]
         serializer = LogSerializer(logs, many=True)

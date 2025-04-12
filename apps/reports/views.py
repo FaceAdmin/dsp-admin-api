@@ -1,9 +1,13 @@
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 import csv
 from datetime import datetime
 from django.http import HttpResponse
 from django.db.models import Avg
 from apps.attendance.models import Attendance
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def generate_csv_report(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -35,7 +39,6 @@ def generate_csv_report(request):
     writer.writerow(["Total Attendances", total_attendances])
     writer.writerow(["Average Working Time", avg_duration_str])
     writer.writerow([])
-
     writer.writerow(["First Name", "Last Name", "Email", "Role", "Check-in", "Check-out", "Duration"])
 
     for attendance in records.select_related('user'):
