@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = 'https://files.faceadmin.org/'
+MEDIA_PATH = env('MEDIA_PATH')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'apps.logs',
     'apps.authentication', 
     'rest_framework.authtoken',
+    'django_q',
 ]
 
 REST_FRAMEWORK = {
@@ -68,6 +70,16 @@ EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = env("SENDGRID_API_KEY")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+Q_CLUSTER = {
+    'name': 'django_q',
+    'workers': 2,            # Количество воркеров, можно увеличить при необходимости
+    'recycle': 500,          # Перезапуск воркеров после заданного количества задач
+    'timeout': 60,           # Таймаут для задачи (в секундах)
+    'queue_limit': 50,       # Максимальное количество задач в очереди
+    'cpu_affinity': 1,       # Прикрепление задач к ядрам CPU, можно настроить по необходимости
+    'orm': 'default',        # Используется база данных Django в качестве брокера
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

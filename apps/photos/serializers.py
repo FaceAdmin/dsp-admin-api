@@ -9,6 +9,6 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_url(self, obj):
-        if obj.photo and hasattr(obj.photo, 'url'):
-            return obj.photo.url
+        if obj.photo:
+            return obj.photo
         return ""
