@@ -8,14 +8,17 @@ import os
 from django_q.tasks import async_task
 from .tasks import process_user_photo_encodings
 from .models import UserFaceEncoding
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 class PhotoView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         photos = Photo.objects.all()
         serializer = PhotoSerializer(photos, many=True)
         return Response(serializer.data)
 
 class PhotoDetailView(APIView):
+    permission_classes = [IsAuthenticated]
     def delete(self, request, pk):
         try:
             photo = Photo.objects.get(pk=pk)
@@ -25,6 +28,7 @@ class PhotoDetailView(APIView):
             return Response({"error": "Photo not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class UploadPhotoView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         user_id = request.POST.get('user_id')
         uploaded_file = request.FILES.get('file')
@@ -49,6 +53,7 @@ class UploadPhotoView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class GetAggregatedEncodingsView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         encodings = {}
         try:

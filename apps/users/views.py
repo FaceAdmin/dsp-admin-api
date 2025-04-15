@@ -51,6 +51,7 @@ class UserView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class VerifyOTPView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         email = request.data.get("email")
         otp_code = request.data.get("otp_code")
