@@ -1,3 +1,4 @@
+import time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,6 +7,7 @@ from .serializers import PhotoSerializer
 from django.conf import settings
 import os
 from django_q.tasks import async_task
+from django.core.cache import cache
 from .tasks import process_user_photo_encodings
 from .models import UserFaceEncoding
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -49,7 +51,12 @@ class UploadPhotoView(APIView):
 
         photo = Photo.objects.create(user_id=user_id, photo=file_name)
         serializer = PhotoSerializer(photo, context={'request': request})
-        async_task('apps.photos.tasks.process_user_photo_encodings', user_id)
+
+        lock_key = f"user_encoding_processing_{user_id}"
+        if not cache.get(lock_key):
+            cache.set(lock_key, True, timeout=15)  # блокируем задачу на 15 секунд
+            async_task('apps.photos.tasks.process_user_photo_encodings', user_id, schedule=time.time()+10)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class GetAggregatedEncodingsView(APIView):
