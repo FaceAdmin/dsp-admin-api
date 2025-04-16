@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,31 +8,34 @@ from rest_framework.permissions import IsAuthenticated
 
 class AttendanceView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request, pk=None):
-        user_id = request.query_params.get('user_id')
-        date_param = request.query_params.get('date')
 
-        if user_id:
-            records = Attendance.objects.filter(user__user_id=user_id)
-            if date_param:
-                records = records.filter(check_in__date=date_param)
+    def get(self, request, pk=None):
+        user = request.user
+
+        if user.role != "Admin":
+            if pk:
+                attendance = get_object_or_404(Attendance, pk=pk, user=user)
+                serializer = AttendanceSerializer(attendance)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            records = Attendance.objects.filter(user=user)
             serializer = AttendanceSerializer(records, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         if pk:
-            try:
-                attendance = Attendance.objects.get(pk=pk)
-            except Attendance.DoesNotExist:
-                return Response({"error": "Record not found"}, status=status.HTTP_404_NOT_FOUND)
+            attendance = get_object_or_404(Attendance, pk=pk)
             serializer = AttendanceSerializer(attendance)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
+        user_id    = request.query_params.get("user_id")
+        date_param = request.query_params.get("date")
+        queryset = Attendance.objects.all()
+        if user_id:
+            queryset = queryset.filter(user__user_id=user_id)
         if date_param:
-            records = Attendance.objects.filter(check_in__date=date_param)
-        else:
-            records = Attendance.objects.all()
+            queryset = queryset.filter(check_in__date=date_param)
 
-        serializer = AttendanceSerializer(records, many=True)
+        serializer = AttendanceSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -42,21 +46,14 @@ class AttendanceView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, pk):
-        try:
-            record = Attendance.objects.get(pk=pk)
-        except Attendance.DoesNotExist:
-            return Response({"error": "Record not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        record = get_object_or_404(Attendance, pk=pk)
         serializer = AttendanceSerializer(record, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def delete(self, request, pk):
-        try:
-            record = Attendance.objects.get(pk=pk)
-            record.delete()
-            return Response({"message": "Attendance record deleted successfully"}, status=status.HTTP_200_OK)
-        except Attendance.DoesNotExist:
-            return Response({"error": "Record not found"}, status=status.HTTP_404_NOT_FOUND)
+        record = get_object_or_404(Attendance, pk=pk)
+        record.delete()
+        return Response({"message": "Attendance record deleted successfully"}, status=status.HTTP_200_OK)
