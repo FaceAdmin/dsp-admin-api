@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'apps.photos',
     'apps.logs',
     'apps.authentication', 
+    'apps.dashboard',
     'rest_framework.authtoken',
     'django_q',
 ]
