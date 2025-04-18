@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 WORKDIR /app
 
-RUN apt update && apt upgrade -y && apt install -y pkg-config build-essential gcc libpq-dev
+RUN apt update && apt upgrade -y && apt install -y pkg-config build-essential gcc libpq-dev cmake
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
