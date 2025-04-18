@@ -8,3 +8,4 @@ sendgrid==3.6.5
 sendgrid-django==4.2.0
 django-cryptography==1.1
 django-q==1.3.9
+django-environ==0.11.2
