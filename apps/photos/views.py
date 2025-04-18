@@ -54,7 +54,7 @@ class UploadPhotoView(APIView):
 
         lock_key = f"user_encoding_processing_{user_id}"
         if not cache.get(lock_key):
-            cache.set(lock_key, True, timeout=15)  # блокируем задачу на 15 секунд
+            cache.set(lock_key, True, timeout=15)
             async_task('apps.photos.tasks.process_user_photo_encodings', user_id, schedule=time.time()+10)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

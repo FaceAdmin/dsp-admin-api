@@ -5,10 +5,6 @@ import face_recognition
 import numpy as np
 
 def process_user_photo_encodings(user_id, **kwargs):
-    """
-    Обрабатываем все фотографии пользователя: для каждого фото вычисляем индивидуальный face encoding,
-    затем агрегируем (среднее) все векторы и сохраняем результат в модели UserFaceEncoding.
-    """
     photos = Photo.objects.filter(user_id=user_id)
     print(f"[DEBUG] Found {photos.count()} photos for user: {user_id}")
     all_encodings = []

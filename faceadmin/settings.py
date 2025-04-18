@@ -74,12 +74,12 @@ SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 
 Q_CLUSTER = {
     'name': 'django_q',
-    'workers': 2,            # Количество воркеров, можно увеличить при необходимости
-    'recycle': 500,          # Перезапуск воркеров после заданного количества задач
-    'timeout': 60,           # Таймаут для задачи (в секундах)
-    'queue_limit': 50,       # Максимальное количество задач в очереди
-    'cpu_affinity': 1,       # Прикрепление задач к ядрам CPU, можно настроить по необходимости
-    'orm': 'default',        # Используется база данных Django в качестве брокера
+    'workers': 2,           
+    'recycle': 500,        
+    'timeout': 60,       
+    'queue_limit': 50,       
+    'cpu_affinity': 1,      
+    'orm': 'default',    
 }
 
 MIDDLEWARE = [
