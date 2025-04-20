@@ -16,7 +16,7 @@ RUN apt update && apt install -y --no-install-recommends \
 # Апгрейд pip и установка всех пакетов
 COPY requirements.txt .
 RUN pip install --upgrade pip setuptools wheel \
- && pip install --only-binary=:all: -r requirements.txt
+ && pip install -r requirements.txt
 
 COPY . .
 
