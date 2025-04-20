@@ -1,12 +1,13 @@
 FROM python:3.10-slim
-
 WORKDIR /app
 
-RUN apt update && apt install -y --no-install-recommends \
-      build-essential \          
-      cmake \
-      python3-dev \            
-      libpq-dev \
+RUN apt update && apt install -y \
+      build-essential \
+      cmake \             
+      make \               
+      ninja-build \        
+      python3-dev \     
+      libpq-dev \       
       libopenblas-dev \
       liblapack-dev \
       libx11-6 \
