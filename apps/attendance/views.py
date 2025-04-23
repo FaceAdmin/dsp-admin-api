@@ -30,8 +30,10 @@ class AttendanceView(APIView):
         user_id    = request.query_params.get("user_id")
         date_param = request.query_params.get("date")
         queryset = Attendance.objects.all()
+
         if user_id:
-            queryset = queryset.filter(user__user_id=user_id)
+            queryset = queryset.filter(user_id=user_id, check_out__isnull=True)
+
         if date_param:
             queryset = queryset.filter(check_in__date=date_param)
 
