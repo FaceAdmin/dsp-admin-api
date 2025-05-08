@@ -10,7 +10,9 @@ class AttendanceView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None):
-        user = request.user
+        user       = request.user
+        date_param = request.query_params.get("date")
+        user_id    = request.query_params.get("user_id")
 
         if user.role != "Admin":
             if pk:
@@ -18,8 +20,11 @@ class AttendanceView(APIView):
                 serializer = AttendanceSerializer(attendance)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-            records = Attendance.objects.filter(user=user)
-            serializer = AttendanceSerializer(records, many=True)
+            queryset = Attendance.objects.filter(user=user)
+            if date_param:
+                queryset = queryset.filter(check_in__date=date_param)
+
+            serializer = AttendanceSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         if pk:
@@ -27,13 +32,9 @@ class AttendanceView(APIView):
             serializer = AttendanceSerializer(attendance)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        user_id    = request.query_params.get("user_id")
-        date_param = request.query_params.get("date")
         queryset = Attendance.objects.all()
-
         if user_id:
             queryset = queryset.filter(user_id=user_id, check_out__isnull=True)
-
         if date_param:
             queryset = queryset.filter(check_in__date=date_param)
 
